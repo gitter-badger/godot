@@ -1,5 +1,5 @@
 /*************************************************************************/
-/*  translation.h                                                        */
+/*  editor_translation.h                                                 */
 /*************************************************************************/
 /*                       This file is part of:                           */
 /*                           GODOT ENGINE                                */
@@ -26,88 +26,27 @@
 /* TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE     */
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                */
 /*************************************************************************/
-#ifndef TRANSLATION_H
-#define TRANSLATION_H
+#ifndef EDITOR_TRANSLATION_H
+#define EDITOR_TRANSLATION_H
 
-#include "resource.h"
+#ifdef TOOLS_ENABLED
+#define _TR(s) (EditorTranslationServer::get_singleton()?String(EditorTranslationServer::get_singleton()->translate(s)):s)
+#else
+#define _TR(s) s
+#endif
 
+#include "core/translation.h"
 
-class Translation : public Resource {
+class EditorTranslationServer : public TranslationServer {
 
-
-	OBJ_TYPE( Translation, Resource );
-	OBJ_SAVE_TYPE( Translation );
-	RES_BASE_EXTENSION("xl");
-
-	String locale;
-	Map<StringName, StringName> translation_map;
-
-	DVector<String> _get_message_list() const;
-
-	DVector<String> _get_messages() const;
-	void _set_messages(const DVector<String>& p_messages);
-protected:
-	static void _bind_methods();
-
+	static EditorTranslationServer *singleton;
 public:
-
-
-	void set_locale(const String& p_locale);
-	_FORCE_INLINE_ String get_locale() const { return locale; }
-
-	void add_message( const StringName& p_src_text, const StringName& p_xlated_text );
-	virtual StringName get_message(const StringName& p_src_text) const; //overridable for other implementations
-	void erase_message(const StringName& p_src_text);
-
-	void get_message_list(List<StringName> *r_messages) const;
-
-	Translation();
+	_FORCE_INLINE_ static EditorTranslationServer *get_singleton() { return singleton; }
+	static void create();
+	static void destroy();
+	void load();
+	String install(String p_file);
+	EditorTranslationServer();
 };
 
-
-class TranslationServer : public Object {
-
-	OBJ_TYPE(TranslationServer, Object);
-
-	String locale;
-	String fallback;
-
-
-	Set< Ref<Translation> > translations;
-
-	bool enabled;
-
-	static TranslationServer *singleton;
-	bool _load_translations(const String& p_from);
-
-	static void _bind_methods();
-public:
-
-	_FORCE_INLINE_ static TranslationServer *get_singleton() { return singleton; }
-
-	//yes, portuguese is supported!
-
-	void set_enabled(bool p_enabled) { enabled=p_enabled; }
-	_FORCE_INLINE_ bool is_enabled() const { return enabled; }
-
-	void set_locale(const String& p_locale);
-	String get_locale() const;
-
-	void add_translation(const Ref<Translation> &p_translation);
-	void remove_translation(const Ref<Translation> &p_translation);
-
-	StringName translate(const StringName& p_message) const;
-
-	static Vector<String> get_all_locales();
-	static Vector<String> get_all_locale_names();
-
-	void setup();
-
-	void load_translations();
-
-	void clear_translations();
-
-	TranslationServer();
-};
-
-#endif // TRANSLATION_H
+#endif // EDITOR_TRANSLATION_H

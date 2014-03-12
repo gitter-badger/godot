@@ -31,6 +31,7 @@
 #include "io/resource_loader.h"
 #include "os/os.h"
 
+
 static const char* locale_list[]={
 "ar", //  Arabic
 "ar_AE", //  Arabic (United Arab Emirates)
@@ -589,6 +590,10 @@ bool TranslationServer::_load_translations(const String& p_from) {
 	}
 
 	return false;
+}
+
+void TranslationServer::clear_translations() {
+	translations.clear();
 }
 
 void TranslationServer::setup() {
